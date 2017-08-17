@@ -38,6 +38,11 @@
         opts: loop
         state: unmounted
 
+    - name: Remove ISO
+      file:
+        path: "{{ ubuntu_iso_destination }}"
+        state: absent
+
 - hosts: cobbler_lxc_server
   user: root
   pre_tasks:

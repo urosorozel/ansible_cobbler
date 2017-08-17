@@ -59,6 +59,10 @@
     daemon_reload: yes
     name: cobblerd
 
+- name: Wait 2 secs
+  pause:
+    seconds: 2
+
 - name: Pre-create tftpboot directory
   file:
     path: /tftpboot
@@ -73,3 +77,14 @@
 
 - name: Import Ubuntu ISO contents
   command: cobbler import --name="{{ ubuntu_distro_name }}"  --path /root/iso
+
+- name: Remove ISO contents
+  file:
+    path: /root/iso
+    state: absent
+
+- name: Update TFTPD xinetd start options
+  lineinfile:
+    path: /etc/xinetd.d/tftp
+    regexp: '^.*server_args'
+    line: '        server_args             = -s /tftpboot'
