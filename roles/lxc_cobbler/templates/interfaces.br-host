@@ -1,0 +1,26 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+iface {{ lxc_host_default_if }} inet manual
+
+auto br-host
+iface br-host inet static
+address {{ ansible_default_ipv4.address }}
+netmask {{ ansible_default_ipv4.netmask }}
+bridge_ports {{ lxc_host_default_if }}
+bridge_stp off
+bridge_fd 0
+bridge_maxwait 0
+gateway {{ ansible_default_ipv4.gateway }}
+dns-nameservers {{ dns_nameservers }}
+
+# Source interfaces
+# Please check /etc/network/interfaces.d before changing this file
+# as interfaces may have been defined in /etc/network/interfaces.d
+# See LP: #1262951
+source /etc/network/interfaces.d/*.cfg

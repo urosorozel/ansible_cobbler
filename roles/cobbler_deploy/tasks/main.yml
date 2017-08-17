@@ -1,0 +1,75 @@
+---
+- name: Download Cobbler source
+  get_url:
+    url: "{{ cobbler_source_url }}"
+    dest: "/root/{{ cobbler_source_file }}" 
+
+- name: Extract cobbler source
+  unarchive:
+    src: "/root/{{ cobbler_source_file }}"
+    dest: /root/
+    remote_src: True
+
+- name: Make / Install Cobbler
+  shell: make && make install
+  args:
+    chdir: "/root/{{ cobbler_source_dir }}"
+    creates: /etc/cobbler/settings  
+
+- name: Link cobbler python code with python libs
+  file:
+    src:  /usr/local/lib/python2.7/dist-packages/cobbler
+    dest: /usr/lib/python2.7/dist-packages/cobbler
+    state: link
+    force: True
+
+- name: Enable Apache proxy module
+  apache2_module:
+    state: present
+    name: "{{ item }}" 
+  with_items:
+    - proxy
+    - proxy_http
+
+- name: Enable Cobbler Apache2 conf
+  command: a2enconf "{{ item }}"
+  with_items:
+    - cobbler
+    - cobbler_web
+
+- name: Copy wsgi app conf
+  copy:
+    src: files/cobbler.wsgi
+    dest: /usr/local/share/cobbler/web/cobbler.wsgi
+
+- name: Generate htdigest password for web interface and api
+  command: htdigest /etc/cobbler/users.digest "Cobbler" cobbler
+
+- name: Install systemd unit for cobbler
+  command: cp /etc/cobbler/cobblerd.service /etc/systemd/system/
+
+- name: Restart apache2 service
+  systemd:
+    name: apache2
+    state: reloaded
+
+- name: Start Cobbler service
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: cobblerd
+
+- name: Pre-create tftpboot directory
+  file:
+    path: /tftpboot
+    state: directory
+    mode: 0755
+
+- name: Get Cobbler loaders
+  command: cobbler get-loaders
+
+- name: Run Initial Cobbler sync
+  command: cobbler sync
+
+- name: Import Ubuntu ISO contents
+  command: cobbler import --name="{{ ubuntu_distro_name }}"  --path /root/iso

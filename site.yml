@@ -1,0 +1,63 @@
+---
+- hosts: cobbler_lxc_host
+  user: root
+
+  pre_tasks:
+    - name: Install dependancies
+      apt: name={{item}} state=present update-cache=yes cache_valid_time=3600
+      with_items:
+        - bridge-utils
+        - lxc
+        - python-lxc
+
+  roles:
+    - role: lxc_cobbler
+
+  post_tasks:
+    - name: Download Ubuntu ISO 
+      get_url:
+        url: "{{ ubuntu_iso_url }}" 
+        dest: "{{ ubuntu_iso_destination }}"
+
+    - name: Mount ISO
+      mount:
+        path: /mnt
+        src: "{{ ubuntu_iso_destination }}"
+        fstype: iso9660
+        opts: loop
+        state: mounted
+
+    - name: Copy ISO contents to LXC container
+      command: cp -r /mnt /var/lib/lxc/{{ lxc_cobbler_build.lxc_name}}/rootfs/root/iso
+
+    - name: unMount ISO
+      mount:
+        path: /mnt
+        src: "{{ ubuntu_iso_destination }}"
+        fstype: iso9660
+        opts: loop
+        state: unmounted
+
+- hosts: cobbler_lxc_server
+  user: root
+  pre_tasks:
+    - name: Install dependancies
+      apt: name={{item}} state=present update-cache=yes cache_valid_time=3600
+      with_items:
+        - python
+        - python2.7
+        - python-django
+        - python-netaddr
+        - python-yaml
+        - python-simplejson
+        - python-cheetah
+        - python-urlgrabber
+        - apache2
+        - libapache2-mod-wsgi
+        - make
+        - isc-dhcp-server
+        - tftpd
+        - git
+  tasks:
+  roles:
+    - role: cobbler_deploy

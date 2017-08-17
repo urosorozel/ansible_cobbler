@@ -1,0 +1,24 @@
+ubuntu_iso_name: ubuntu-16.04.3-server-amd64.iso
+ubuntu_iso_url: http://releases.ubuntu.com/16.04/{{ ubuntu_iso_name }}
+ubuntu_iso_destination: /tmp/{{ ubuntu_iso_name }}
+
+# LXC host vars
+lxc_host_default_if: ens3
+dns_nameservers: 8.8.8.8
+
+# Cobbler LXC vars
+lxc_cobbler_proxy_list: "{{ global_environment_variables }}"
+#lxc_cobbler.lxc_cobbler_config
+lxc_cobbler_build:
+  lxc_name: cobbler
+  state: started
+  template: ubuntu
+  template_options: --release xenial
+  allow_loop: True
+  lxc_cobbler_config:
+  - device: eth0
+    lxc_network_flags: up
+    lxc_network_link: br-host
+    lxc_network_hwaddr: 00:16:3e:xx:xx:xx
+    lxc_network_ipv4: 10.10.10.120/24
+    lxc_network_ipv4_gateway: 10.10.10.1

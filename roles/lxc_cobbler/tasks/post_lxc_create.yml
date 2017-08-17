@@ -1,0 +1,32 @@
+- name: SSH directory
+  file: path="/var/lib/lxc/{{ lxc_cobbler_build.lxc_name}}/rootfs/root/.ssh" state=directory
+
+- name: Copy SSH key
+  copy: src="{{ lookup('env','HOME') }}/.ssh/id_rsa.pub" dest=/var/lib/lxc/{{ lxc_cobbler_build.lxc_name}}/rootfs/root/.ssh/authorized_keys mode=0600
+
+- name: Disable DHCP on eth0
+  replace:
+    dest: /var/lib/lxc/{{ lxc_cobbler_build.lxc_name}}/rootfs/etc/network/interfaces
+    regexp: '^iface eth0 inet dhcp$'
+    replace: 'iface eth0 inet manual'
+
+- name: Install container proxy settings
+  template:
+    dest: "/var/lib/lxc/{{ lxc_cobbler_build.lxc_name}}/rootfs/etc/environment"
+    src: "environment.j2"
+    mode: "0644"
+  remote_user: root
+  when:
+    - global_environment_variables is defined
+  tags:
+    - lxc-container-proxy
+
+- name: Install base pkg
+  lxc_container:
+    name: "{{ lxc_cobbler_build.lxc_name}}"
+    container_command: |
+      apt-key update
+      apt-get update
+      apt-get upgrade -y >>/root/upgrade_output.log 2>>/root/upgrade_output.err
+      apt-get install --force-yes -y wget openssh-server python python-dev host >>/root/install_output.log 2>>/root/install_output.err
+      service ssh restart

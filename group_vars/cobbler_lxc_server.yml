@@ -1,0 +1,4 @@
+ubuntu_distro_name: ubuntu-16.04.3-server-amd64
+cobbler_source_dir: cobbler-2.8.1
+cobbler_source_file: v2.8.1.tar.gz
+cobbler_source_url: https://github.com/cobbler/cobbler/archive/{{ cobbler_source_file }}

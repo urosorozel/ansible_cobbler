@@ -1,0 +1,4 @@
+---
+- include: setup-bridge.yml
+- include: create_lxc.yml
+- include: post_lxc_create.yml

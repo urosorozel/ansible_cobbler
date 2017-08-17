@@ -1,0 +1,16 @@
+---
+
+- name: Create network config for container
+  template: 
+    src: lxc_cobbler_config.j2
+    dest: "/tmp/{{ lxc_cobbler_build.lxc_name}}_lxc_config"
+
+- name: Create container
+  lxc_container:
+    name: "{{ lxc_cobbler_build.lxc_name }}"
+    container_log: true
+    template: "{{ lxc_cobbler_build.template }}"
+    state: "{{ lxc_cobbler_build.state }}"
+    template_options: "{{ lxc_cobbler_build.template_options }}"
+    config: "/tmp/{{ lxc_cobbler_build.lxc_name }}_lxc_config"
+#  environment: "{{ lxc_cobbler_proxy_list }}"

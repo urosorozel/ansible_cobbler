@@ -1,0 +1,14 @@
+# Network configuration
+{% for config in lxc_cobbler_build.lxc_cobbler_config %}
+lxc.start.auto = 1
+lxc.network.type = veth
+lxc.network.name  =  {{ config.device }}
+lxc.network.ipv4  =  {{ config.lxc_network_ipv4 }}
+lxc.network.link  =  {{ config.lxc_network_link }}
+lxc.network.hwaddr  = {{ config.lxc_network_hwaddr }}
+lxc.network.flags = {{ config.lxc_network_flags }}
+lxc.network.mtu  =  1500
+{% if config.lxc_network_ipv4_gateway is defined  %}
+lxc.network.ipv4.gateway = {{ config.lxc_network_ipv4_gateway }}
+{% endif %}
+{% endfor %}
