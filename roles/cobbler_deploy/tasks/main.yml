@@ -91,10 +91,8 @@
 - debug: var=ubuntu_distro_name
 
 - name: Import Ubuntu ISO contents
-  command: cobbler import --name="{{ item }}"  --path /root/iso
-  when: item  not in cobbler_distro_list.stdout_lines
-  #when: cobbler_distro_list.stdout.find(ubuntu_distro_name) == -1
-  with_items: "{{ ubuntu_distro_names }}"
+  command: cobbler import --name="{{ ubuntu_distro_name }}"  --path /root/iso
+  when: ubuntu_distro_name  not in cobbler_distro_list.stdout_lines
 
 - name: Remove ISO contents
   file:
@@ -123,3 +121,11 @@
     dest: /etc/cobbler/settings
     regexp: "manage_dhcp: 0"
     replace: "manage_dhcp: 1"
+
+- name: Enable serial console
+  command: |
+    cobbler profile  edit 
+      --name {{ ubuntu_distro_name }} \
+      --kopts="ksdevice=bootif lang console={{cobbler_tty}} locale=en_US text priority=critical netcfg/choose_interface=auto  tty0" \
+      --kopts-post="console=tty0 console={{cobbler_tty}}"
+  when: cobbler_tty_enabled
