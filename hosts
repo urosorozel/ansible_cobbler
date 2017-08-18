@@ -1,5 +1,5 @@
 [cobbler_lxc_host]
-cobbler-lxc-host ansible_host=10.10.10.109
+cobbler-lxc-host ansible_host=10.10.10.111
 
 [cobbler_lxc_server]
 cobbler-lxc-server ansible_host=10.10.10.120 

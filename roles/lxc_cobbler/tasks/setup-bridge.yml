@@ -1,7 +1,10 @@
 ---
 - apt: name=bridge-utils state=present
+
 - name: Setup bridge br-host where "{{ lxc_host_default_if }}" connects to this bridge
   template: src=../templates/interfaces.br-host dest=/etc/network/interfaces
-  notify:
-    - restart_networking
+  register: network_bridge
 
+- name: restart_networking
+  service: name=networking state=restarted
+  when: network_bridge.changed

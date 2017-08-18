@@ -103,7 +103,7 @@
 
 - name: Update TFTPD xinetd start options
   lineinfile:
-    path: /etc/xinetd.d/tftp
+    path: /etc/cobbler/tftpd.template
     regexp: '^.*server_args'
     line: '        server_args             = -s /tftpboot'
 
@@ -116,4 +116,10 @@
   replace:
     dest: /etc/cobbler/settings
     regexp: "127.0.0.1"
-    replace: "{{ ansible_default_ipv4.address }}" 
+    replace: "{{ ansible_default_ipv4.address }}"
+
+- name: "Enable manage DHCP /etc/cobbler/settings"
+  replace:
+    dest: /etc/cobbler/settings
+    regexp: "manage_dhcp: 0"
+    replace: "manage_dhcp: 1"
