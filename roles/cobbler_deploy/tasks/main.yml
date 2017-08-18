@@ -23,6 +23,9 @@
     state: link
     force: True
 
+- name: Set Cobbler Django app secret key
+  lineinfile: dest=/usr/local/share/cobbler/web/settings.py  regexp='^SECRET_KEY' line="SECRET_KEY = '{{ cobbler_secret_key }}'"
+
 - name: Enable Apache proxy module
   apache2_module:
     state: present
@@ -44,6 +47,12 @@
 
 - name: Generate htdigest password for web interface and api
   command: htdigest /etc/cobbler/users.digest "Cobbler" cobbler
+
+- name: Set dhcp server interface
+  lineinfile: dest=/etc/default/isc-dhcp-server regexp='^INTERFACES=' line=INTERFACES="{{ cobbler_dhcp_interface }}"
+
+- name: Dhcp server config template
+  template: src=templates/dhcp.j2 dest=/etc/cobbler/dhcp.template
 
 - name: Install systemd unit for cobbler
   command: cp /etc/cobbler/cobblerd.service /etc/systemd/system/
@@ -75,8 +84,17 @@
 - name: Run Initial Cobbler sync
   command: cobbler sync
 
+- name: Check cobbler distro list
+  shell: cobbler distro list | tr -d ' '
+  register: cobbler_distro_list
+
+- debug: var=ubuntu_distro_name
+
 - name: Import Ubuntu ISO contents
-  command: cobbler import --name="{{ ubuntu_distro_name }}"  --path /root/iso
+  command: cobbler import --name="{{ item }}"  --path /root/iso
+  when: item  not in cobbler_distro_list.stdout_lines
+  #when: cobbler_distro_list.stdout.find(ubuntu_distro_name) == -1
+  with_items: "{{ ubuntu_distro_names }}"
 
 - name: Remove ISO contents
   file:
@@ -88,3 +106,14 @@
     path: /etc/xinetd.d/tftp
     regexp: '^.*server_args'
     line: '        server_args             = -s /tftpboot'
+
+- name: Restart xinetd service
+  service:
+    name: xinetd
+    state: restarted
+
+- name: "Replace 127.0.0.1 with primary ip /etc/cobbler/settings"
+  replace:
+    dest: /etc/cobbler/settings
+    regexp: "127.0.0.1"
+    replace: "{{ ansible_default_ipv4.address }}" 

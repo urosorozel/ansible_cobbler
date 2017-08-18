@@ -1,3 +1,3 @@
 ---
-- name: restart networking
+- name: restart_networking
   service: name=networking state=restarted
