@@ -1,17 +1,21 @@
 #ubuntu_distro_name: ubuntu-16.04.3-server-amd64
 ubuntu_distro_name: ubuntu-16.04.3-server-x86_64
+
 cobbler_source_dir: cobbler-2.8.1
 cobbler_source_file: v2.8.1.tar.gz
 cobbler_source_url: https://github.com/cobbler/cobbler/archive/{{ cobbler_source_file }}
 # openssl rand 100000 | sha1sum| awk '{print $1}'for below key
 cobbler_secret_key: 69daebf5bb45e5a33795b9e3fdfa649267427c07
-cobbler_dhcp_interface: eth0
+cobbler_dhcp_interface: eth1
 cobbler_network: 10.10.10.0
 cobbler_netmask: 255.255.255.0
 cobbler_gateway: 10.10.10.1
 cobbler_nameservers: 10.10.10.1
 cobbler_boot_range: 10.10.10.100 10.10.10.150
 
+
+cobbler_ubuntu_profile: "{{ ubuntu_distro_name }}"
+cobler_ubuntu_kickstart: /var/lib/cobbler/kickstarts/ubuntu-server-xenial-unattended-cobbler-rpc.seed
 # Configure tty via serial
 cobbler_tty_enabled: True
 cobbler_tty: ttyS0

@@ -18,8 +18,6 @@
   remote_user: root
   when:
     - global_environment_variables is defined
-  tags:
-    - lxc-container-proxy
 
 - name: Install base pkg
   lxc_container:
@@ -30,3 +28,7 @@
       apt-get upgrade -y >>/root/upgrade_output.log 2>>/root/upgrade_output.err
       apt-get install --force-yes -y wget openssh-server python python-dev host >>/root/install_output.log 2>>/root/install_output.err
       service ssh restart
+
+- name: Pause for a bit
+  pause:
+    seconds: 4

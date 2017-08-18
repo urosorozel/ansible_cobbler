@@ -105,16 +105,11 @@
     regexp: '^.*server_args'
     line: '        server_args             = -s /tftpboot'
 
-- name: Restart xinetd service
-  service:
-    name: xinetd
-    state: restarted
-
 - name: "Replace 127.0.0.1 with primary ip /etc/cobbler/settings"
   replace:
     dest: /etc/cobbler/settings
     regexp: "127.0.0.1"
-    replace: "{{ ansible_default_ipv4.address }}"
+    replace: "{{ ansible_eth1.ipv4.address }}"
 
 - name: "Enable manage DHCP /etc/cobbler/settings"
   replace:
@@ -122,10 +117,55 @@
     regexp: "manage_dhcp: 0"
     replace: "manage_dhcp: 1"
 
-- name: Enable serial console
+- name: Enable serial console on default profile
   command: |
     cobbler profile  edit 
       --name {{ ubuntu_distro_name }} \
       --kopts="ksdevice=bootif lang console={{cobbler_tty}} locale=en_US text priority=critical netcfg/choose_interface=auto  tty0" \
       --kopts-post="console=tty0 console={{cobbler_tty}}"
   when: cobbler_tty_enabled
+
+- name: Get sources.list file
+  copy: src=files/xenial-sources.list dest=/var/www/html/
+
+- name: Read ssh public key
+  set_fact:
+    cobbler_public_key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+
+- name: Copy preseed files
+  copy: src=files/ubuntu-server-xenial-unattended-cobbler-rpc.seed dest=/var/lib/cobbler/kickstarts/
+
+- name: Add late preseed script
+  template: src=templates/preseed_xenial_late.j2 dest=/var/lib/cobbler/scripts/preseed_xenial_late
+
+- name: Add late preseed snippet
+  template: src=templates/preseed_xenial_post_deploy.j2 dest=/var/lib/cobbler/snippets/preseed_xenial_post_deploy
+
+- name: Add RPC Cobbler profile
+  command: |
+      cobbler profile add \
+      --name rpc-xenial-profile \
+      --kickstart {{ cobler_ubuntu_kickstart }} \
+      --distro {{ ubuntu_distro_name }} \
+      --kopts="ksdevice=bootif lang locale=en_US text priority=critical netcfg/choose_interface=auto" 
+
+- name: Edit RPC Cobbler profile
+  command: |
+      cobbler profile edit \
+      --name rpc-xenial-profile \
+      --kopts="ksdevice=bootif lang console={{cobbler_tty}} locale=en_US text priority=critical netcfg/choose_interface=auto  tty0" \
+      --kopts-post="console=tty0 console={{cobbler_tty}}"
+  when: cobbler_tty_enabled
+
+- name: Cobbler sync
+  command: cobbler sync
+
+- name: Restart cobbler service
+  service:
+    name: cobblerd
+    state: restarted
+
+- name: Restart xinetd service
+  service:
+    name: xinetd
+    state: restarted

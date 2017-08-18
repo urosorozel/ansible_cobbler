@@ -16,9 +16,9 @@ lxc_cobbler_build:
   template_options: --release xenial
   allow_loop: True
   lxc_cobbler_config:
-  - device: eth0
+  - device: eth1
     lxc_network_flags: up
     lxc_network_link: br-host
     lxc_network_hwaddr: 00:16:3e:xx:xx:xx
     lxc_network_ipv4: 10.10.10.120/24
-    lxc_network_ipv4_gateway: 10.10.10.1
+    #lxc_network_ipv4_gateway: 10.10.10.1

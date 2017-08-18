@@ -1,4 +1,14 @@
 # Network configuration
+
+# {{ ansible_managed }}
+
+# First network interface connected to external network
+lxc.network.type = veth
+lxc.network.link = lxcbr0
+lxc.network.flags = up
+
+# Second network interface connected to internal network
+lxc.network.flags = up
 {% for config in lxc_cobbler_build.lxc_cobbler_config %}
 lxc.start.auto = 1
 lxc.network.type = veth
