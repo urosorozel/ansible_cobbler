@@ -56,4 +56,9 @@ cobbler_tty_enabled: True
 cobbler_tty: ttyS0
 ``` 
 
+Add system
+
+```
+cobbler system add --name=foo --profile=ubuntu-16.04.3-server-x86_64 --interface=ens2 --mac=52:54:00:00:00:81 --ip-address=10.10.10.13
+```
 * run ansible-playbook -i hosts site.yml

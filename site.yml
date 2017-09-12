@@ -38,6 +38,14 @@
         opts: loop
         state: unmounted
 
+    - name: remove ISO from fstab
+      mount:
+        path: /mnt
+        src: "{{ ubuntu_iso_destination }}"
+        fstype: iso9660
+        opts: loop
+        state: absent
+
     - name: Remove ISO
       file:
         path: "{{ ubuntu_iso_destination }}"
