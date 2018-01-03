@@ -1,4 +1,14 @@
 ---
+- name: Install packages for power managent support and ipxe
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - fence-agents
+    - ipxe
+    - ipmitool
+
 - name: Download Cobbler source
   get_url:
     url: "{{ cobbler_source_url }}"
@@ -62,6 +72,18 @@
     name: apache2
     state: reloaded
 
+- name: Add proxy server if variable global_environment_variables is set
+  lineinfile:
+    path: /etc/cobbler/settings
+    regex: '^set proxy_url_ext'
+    line: "proxy_url_ext: {{ global_environment_variables.http_proxy }}"
+  when: global_environment_variables.http_proxy is defined
+
+- name: Add support for ipmitool
+  lineinfile:
+    path: /etc/cobbler/power/fence_ipmilan.template
+    line: "lanplus=1"
+
 - name: Start Cobbler service
   systemd:
     state: restarted
@@ -77,6 +99,12 @@
     path: /tftpboot
     state: directory
     mode: 0755
+
+- name: Copy ipxe to tftpboot
+  copy:
+    remote_src: yes
+    src: /usr/lib/ipxe/undionly.kpxe
+    dest /tftpboot/undionly.kpxe
 
 - name: Get Cobbler loaders
   command: cobbler get-loaders
@@ -121,7 +149,7 @@
   command: |
     cobbler profile  edit 
       --name {{ ubuntu_distro_name }} \
-      --kopts="ksdevice=bootif lang console={{cobbler_tty}} locale=en_US text priority=critical netcfg/choose_interface=auto  tty0" \
+      --kopts="ksdevice=bootif lang console={{cobbler_tty}} locale=en_US text priority=critical netcfg/dhcp_timeout=60 netcfg/choose_interface=auto  tty0" \
       --kopts-post="console=tty0 console={{cobbler_tty}}"
   when: cobbler_tty_enabled
 
