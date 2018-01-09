@@ -104,7 +104,7 @@
   copy:
     remote_src: yes
     src: /usr/lib/ipxe/undionly.kpxe
-    dest /tftpboot/undionly.kpxe
+    dest: /tftpboot/undionly.kpxe
 
 - name: Get Cobbler loaders
   command: cobbler get-loaders
