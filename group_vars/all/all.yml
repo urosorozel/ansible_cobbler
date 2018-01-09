@@ -1,9 +1,9 @@
-http_proxy: http://10.184.227.134:3128
-https_proxy: http://10.184.227.134:3128
-global_environment_variables:
-  http_proxy: '{{ http_proxy }}'
-  https_proxy: '{{ http_proxy }}'
-  no_proxy: localhost
-  HTTP_PROXY: '{{ http_proxy }}'
-  HTTPS_PROXY: '{{ http_proxy }}'
-  NO_PROXY: localhost
+#http_proxy: http://10.184.227.134:3128
+#https_proxy: http://10.184.227.134:3128
+#global_environment_variables:
+#  http_proxy: '{{ http_proxy }}'
+#  https_proxy: '{{ http_proxy }}'
+#  no_proxy: localhost
+#  HTTP_PROXY: '{{ http_proxy }}'
+#  HTTPS_PROXY: '{{ http_proxy }}'
+#  NO_PROXY: localhost

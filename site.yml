@@ -14,10 +14,24 @@
     - role: lxc_cobbler
 
   post_tasks:
+    - name: Check ISO size
+      uri:
+        url: "{{ ubuntu_iso_url }}"
+        method: HEAD
+        validate_certs: no
+      register: url_stat
+
+    - name: Check local ISO size
+      stat:
+        path: "{{ ubuntu_iso_destination | basename }}"
+      register: file_stat
+
     - name: Download Ubuntu ISO 
       get_url:
         url: "{{ ubuntu_iso_url }}" 
         dest: "{{ ubuntu_iso_destination }}"
+      when: not file_stat.stat.exists or
+          url_stat.content_length != file_stat.stat.siz
 
     - name: Mount ISO
       mount:
@@ -46,11 +60,6 @@
         opts: loop
         state: absent
 
-    - name: Remove ISO
-      file:
-        path: "{{ ubuntu_iso_destination }}"
-        state: absent
-
 - hosts: cobbler_lxc_server
   user: root
   pre_tasks:
@@ -74,3 +83,11 @@
   tasks:
   roles:
     - role: cobbler_deploy
+
+- hosts: cobbler_lxc_host
+  user: root
+  tasks:
+    - name: Remove ISO after successful deployment
+      file:
+        path: "{{ ubuntu_iso_destination }}"
+        state: absent

@@ -34,7 +34,10 @@
     force: True
 
 - name: Set Cobbler Django app secret key
-  lineinfile: dest=/usr/local/share/cobbler/web/settings.py  regexp='^SECRET_KEY' line="SECRET_KEY = '{{ cobbler_secret_key }}'"
+  lineinfile:
+    dest: /usr/local/share/cobbler/web/settings.py
+    regexp: '^SECRET_KEY'
+    line: "SECRET_KEY = '{{ cobbler_secret_key }}'"
 
 - name: Enable Apache proxy module
   apache2_module:
@@ -58,11 +61,28 @@
 - name: Generate htdigest password for web interface and api
   command: htdigest /etc/cobbler/users.digest "Cobbler" cobbler
 
+- name: Remove Apache 2.2 Order allow,deny from /etc/apache2/conf-available/cobbler.conf
+  lineinfile:
+    path: /etc/apache2/conf-available/cobbler.conf
+    regexp: "^.*Order allow,deny"
+    state: absent
+
+- name: Replace Apache 2.2 Allow from all with Require all granted
+  replace:
+    path: /etc/apache2/conf-available/cobbler.conf
+    regexp: "^.*Allow from all"
+    replace: "    Require all granted"
+
 - name: Set dhcp server interface
-  lineinfile: dest=/etc/default/isc-dhcp-server regexp='^INTERFACES=' line=INTERFACES="{{ cobbler_dhcp_interface }}"
+  lineinfile:
+    dest: /etc/default/isc-dhcp-server
+    regexp: '^INTERFACES='
+    line: INTERFACES="{{ cobbler_dhcp_interface }}"
 
 - name: Dhcp server config template
-  template: src=templates/dhcp.j2 dest=/etc/cobbler/dhcp.template
+  template:
+    src: templates/dhcp.j2
+    dest: /etc/cobbler/dhcp.template
 
 - name: Install systemd unit for cobbler
   command: cp /etc/cobbler/cobblerd.service /etc/systemd/system/
@@ -75,9 +95,9 @@
 - name: Add proxy server if variable global_environment_variables is set
   lineinfile:
     path: /etc/cobbler/settings
-    regex: '^set proxy_url_ext'
+    regexp: '^proxy_url_ext'
     line: "proxy_url_ext: {{ global_environment_variables.http_proxy }}"
-  when: global_environment_variables.http_proxy is defined
+  when: global_environment_variables is defined
 
 - name: Add support for ipmitool
   lineinfile:
@@ -104,7 +124,7 @@
   copy:
     remote_src: yes
     src: /usr/lib/ipxe/undionly.kpxe
-    dest /tftpboot/undionly.kpxe
+    dest: /tftpboot/undionly.kpxe
 
 - name: Get Cobbler loaders
   command: cobbler get-loaders
