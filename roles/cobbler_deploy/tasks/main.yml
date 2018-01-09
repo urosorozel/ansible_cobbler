@@ -85,7 +85,9 @@
     dest: /etc/cobbler/dhcp.template
 
 - name: Install systemd unit for cobbler
-  command: cp /etc/cobbler/cobblerd.service /etc/systemd/system/
+  copy:
+    src: /etc/cobbler/cobblerd.service
+    dest: /etc/systemd/system/cobblerd.service
 
 - name: Restart apache2 service
   systemd:
