@@ -59,6 +59,25 @@ cobbler_tty: ttyS0
 Add system
 
 ```
-cobbler system add --name=foo --profile=ubuntu-16.04.3-server-x86_64 --interface=ens2 --mac=52:54:00:00:00:81 --ip-address=10.10.10.13
+cobbler system add --name=foo --profile=rpc-xenial-profile --interface=ens2 --mac=52:54:00:00:00:81 --ip-address=10.10.10.13
 ```
 * run ansible-playbook -i hosts site.yml
+
+Test cobbler provisioning in VM on same pysical host
+
+* attach to cobbler container and create new system
+```
+cobbler system add --name=cobbler1 --profile=rpc-xenial-profile --interface=ens2 --mac=0c:c4:7a:b6:16:f1 --ip-address=10.10.10.130
+cobbler sync
+```
+
+* detach from container and run playbook
+```
+ansible-galaxy install -r reqirements.yml
+ansible-playbook create_qemu_vm.yml
+```
+
+* playbok will also create VBMC entry and service for created VM
+```
+ipmitool -I lanplus -H 10.10.10.121 -U ADMIN -P ADMIN chassis power status
+```

@@ -1,0 +1,49 @@
+- name: Add root user to libvirt-qemu group on compute node for virt-install
+  hosts: cobbler_lxc_host
+  tags:
+    - bmc
+  pre_tasks:
+    - name: Install qemu and libvirt-bin
+      apt:
+        name: "{{item}}"
+      items:
+        - qemu
+        - libvirt-bin   
+        - python-netaddr
+        - ipmitool
+
+    - name: Add root to group libvirt-qemu for libvirt role to work
+      user:
+        name: root
+        groups: libvirt-qemu
+        append: yes
+
+  roles:
+    - role: debops.libvirt
+  tasks:
+    - name: Install packages
+      apt:
+        name: virtinst
+        state: present
+  
+    - name: Start Virtual machine
+      command: >
+        virt-install --name="{{ item.name }}"
+                     --vcpus="{{ item.cpu }}"
+                     --ram="{{ item.memory }}"
+                     --description="libvirt VM"
+                     --boot="hd,network,menu=on"
+                     --controller="type=scsi"
+                     --noautoconsole
+                     --virt-type="{{ item.virtualization }}"
+                     --os-type=linux
+        {% for dev in item.block_device_list %}
+                     --disk pool="{{ item.block_pool }},size={{ dev.block_size }},device=disk,sparse=true,format=qcow2"
+        {% endfor %}
+        {% for dev in item.network_device_list %}
+                     --network bridge="{{ dev.host_net_dev }}{% if dev.host_net_mac is defined %},mac={{ dev.host_net_mac }}{% endif %},model=virtio"
+        {% endfor %}
+      with_items: "{{ cobbler_nodes }}"
+      tags: create_ironic
+
+    - include: virtual_bmc.yml

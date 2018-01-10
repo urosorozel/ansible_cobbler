@@ -22,3 +22,35 @@ lxc_cobbler_build:
     lxc_network_hwaddr: 00:16:3e:xx:xx:xx
     lxc_network_ipv4: 10.10.10.120/24
     #lxc_network_ipv4_gateway: 10.10.10.1
+
+libvirt__group_map:
+  'Debian': 'libvirt'
+  'Ubuntu': 'libvirtd'
+  'Ubuntu': 'libvirt-qemu'
+libvirt__connections:
+  'localhost':  'qemu:///system'
+libvirt__pools:
+   - name: 'cobbler_pool'
+     type: 'dir'
+     path: '/cobbler_pool'
+     state: active
+
+vbmc_libvirt_uri: qemu:///system
+vbmc_bridge: br-host
+
+cobbler_nodes:
+  - name: cobbler1
+    vbmc: 10.10.10.121
+    vbmc_bridge: br-host
+    cpu: 1
+    memory: 1024
+    virtualization: qemu
+    fqdn: cobbler1
+    block_pool: cobbler_pool
+    network_device_list:
+    - device: eth0
+      host_net_dev: br-host
+      host_net_mac: 0c:c4:7a:b6:16:f1
+    block_device_list:
+    - device: sda
+      block_size: 10
