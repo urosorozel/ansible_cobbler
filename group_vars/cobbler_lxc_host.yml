@@ -23,6 +23,7 @@ lxc_cobbler_build:
     lxc_network_ipv4: 10.10.10.120/24
     #lxc_network_ipv4_gateway: 10.10.10.1
 
+# Below attributes are for Cobbler provisioning testing
 libvirt__group_map:
   'Debian': 'libvirt'
   'Ubuntu': 'libvirtd'
@@ -38,6 +39,7 @@ libvirt__pools:
 vbmc_libvirt_uri: qemu:///system
 vbmc_bridge: br-host
 
+# Cobbler test server
 cobbler_nodes:
   - name: cobbler1
     vbmc: 10.10.10.121
@@ -49,6 +51,7 @@ cobbler_nodes:
     block_pool: cobbler_pool
     network_device_list:
     - device: eth0
+      ip_address: 10.10.10.130
       host_net_dev: br-host
       host_net_mac: 0c:c4:7a:b6:16:f1
     block_device_list:

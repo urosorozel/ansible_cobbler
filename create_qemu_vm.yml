@@ -1,8 +1,31 @@
+#- name: Add root user to libvirt-qemu group on compute node for virt-install
+#  hosts: cobbler_lxc_server
+#  tasks:
+#    - name: Install base pkg
+#      lxc_container:
+#        name: "{{ lxc_cobbler_build.lxc_name}}"
+#        container_command: |
+#          cobbler system add --name="{{item.name}}" --profile=rpc-xenial-profile --interface=ens2 \
+#                             --mac="{{item.network_device_list[0].host_net_mac}}" \
+#                             --ip-address="{{item.network_device_list[0].ip_address}}"
+#          cobbler sync
+#      with_items: "{{ cobbler_nodes }}"
+
 - name: Add root user to libvirt-qemu group on compute node for virt-install
   hosts: cobbler_lxc_host
   tags:
     - bmc
   pre_tasks:
+    - name: Create cobbler system
+      lxc_container:
+        name: "{{ lxc_cobbler_build.lxc_name}}"
+        container_command: |
+          cobbler system add --name="{{item.name}}" --profile=rpc-xenial-profile --interface=ens2 \
+                             --mac="{{item.network_device_list[0].host_net_mac}}" \
+                             --ip-address="{{item.network_device_list[0].ip_address}}"
+          cobbler sync
+      with_items: "{{ cobbler_nodes }}"
+
     - name: Add cloud repository
       apt_repository:
         repo: deb http://ubuntu-cloud.archive.canonical.com/ubuntu xenial-updates/pike main
@@ -12,8 +35,8 @@
     - name: Install qemu and libvirt-bin
       apt:
         name: "{{item}}"
+        update_cache: yes
       items:
-        - ubuntu-cloud-keyring
         - qemu
         - libvirt-bin   
         - ipmitool

@@ -6,6 +6,7 @@
     - name: Install dependancies
       apt: name={{item}} state=present update-cache=yes cache_valid_time=3600
       with_items:
+        - ubuntu-cloud-keyring
         - python-netaddr
         - bridge-utils
         - lxc
