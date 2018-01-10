@@ -26,7 +26,7 @@ lxc_cobbler_build:
 # Below attributes are for Cobbler provisioning testing
 libvirt__group_map:
   'Debian': 'libvirt'
-  'Ubuntu': 'libvirtd'
+#  'Ubuntu': 'libvirtd'
   'Ubuntu': 'libvirt-qemu'
 libvirt__connections:
   'localhost':  'qemu:///system'

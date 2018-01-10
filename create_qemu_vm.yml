@@ -1,16 +1,3 @@
-#- name: Add root user to libvirt-qemu group on compute node for virt-install
-#  hosts: cobbler_lxc_server
-#  tasks:
-#    - name: Install base pkg
-#      lxc_container:
-#        name: "{{ lxc_cobbler_build.lxc_name}}"
-#        container_command: |
-#          cobbler system add --name="{{item.name}}" --profile=rpc-xenial-profile --interface=ens2 \
-#                             --mac="{{item.network_device_list[0].host_net_mac}}" \
-#                             --ip-address="{{item.network_device_list[0].ip_address}}"
-#          cobbler sync
-#      with_items: "{{ cobbler_nodes }}"
-
 - name: Add root user to libvirt-qemu group on compute node for virt-install
   hosts: cobbler_lxc_host
   tags:
@@ -75,4 +62,4 @@
       with_items: "{{ cobbler_nodes }}"
       tags: create_ironic
 
-    - include: virtual_bmc.yml
+    - include_tasks: virtual_bmc.yml
