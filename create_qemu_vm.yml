@@ -3,13 +3,19 @@
   tags:
     - bmc
   pre_tasks:
+    - name: Add cloud repository
+      apt_repository:
+        repo: deb http://ubuntu-cloud.archive.canonical.com/ubuntu xenial-updates/pike main
+        state: present
+        update_cache: yes
+
     - name: Install qemu and libvirt-bin
       apt:
         name: "{{item}}"
       items:
+        - ubuntu-cloud-keyring
         - qemu
         - libvirt-bin   
-        - python-netaddr
         - ipmitool
 
     - name: Add root to group libvirt-qemu for libvirt role to work
