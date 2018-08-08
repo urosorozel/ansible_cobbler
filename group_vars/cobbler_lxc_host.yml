@@ -1,8 +1,9 @@
-ubuntu_iso_name: ubuntu-16.04.3-server-amd64.iso
+ubuntu_iso_name: ubuntu-16.04.5-server-amd64.iso
 ubuntu_iso_url: http://releases.ubuntu.com/16.04/{{ ubuntu_iso_name }}
 ubuntu_iso_destination: /tmp/{{ ubuntu_iso_name }}
 
 # LXC host vars
+lxc_host_setup_bridge: False
 lxc_host_default_if: ens3
 dns_nameservers: 8.8.8.8
 

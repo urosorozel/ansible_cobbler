@@ -1,4 +1,5 @@
 ---
 - include: setup-bridge.yml
+  when: lxc_host_setup_bridge
 - include: create_lxc.yml
 - include: post_lxc_create.yml
