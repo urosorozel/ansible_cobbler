@@ -1,13 +1,12 @@
 ---
 - name: Install packages for power managent support and ipxe
   apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-  with_items:
+    name:
     - fence-agents
     - ipxe
     - ipmitool
+    state: present
+    update_cache: yes
 
 - name: Download Cobbler source
   get_url:
@@ -164,6 +163,11 @@
     dest: /etc/cobbler/settings
     regexp: "manage_dhcp: 0"
     replace: "manage_dhcp: 1"
+
+- name: Get latest signatures
+  get_url:
+   src: https://raw.githubusercontent.com/cobbler/cobbler/master/config/cobbler/distro_signatures.json
+   dest: /var/lib/cobbler/distro_signatures.json
 
 - name: Enable serial console on default profile
   command: |

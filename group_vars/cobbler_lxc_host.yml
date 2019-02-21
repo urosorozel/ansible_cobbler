@@ -3,7 +3,7 @@ ubuntu_iso_url: http://releases.ubuntu.com/16.04/{{ ubuntu_iso_name }}
 ubuntu_iso_destination: /tmp/{{ ubuntu_iso_name }}
 
 # LXC host vars
-lxc_host_setup_bridge: False
+lxc_host_setup_bridge: True
 lxc_host_default_if: ens3
 dns_nameservers: 8.8.8.8
 
@@ -21,8 +21,8 @@ lxc_cobbler_build:
     lxc_network_flags: up
     lxc_network_link: br-host
     lxc_network_hwaddr: 00:16:3e:xx:xx:xx
-    lxc_network_ipv4: 10.10.10.120/24
-    #lxc_network_ipv4_gateway: 10.10.10.1
+    lxc_network_ipv4: 192.168.122.120/24
+    #lxc_network_ipv4_gateway: 192.168.122.1
 
 # Below attributes are for Cobbler provisioning testing
 libvirt__group_map:
@@ -43,7 +43,7 @@ vbmc_bridge: br-host
 # Cobbler test server
 cobbler_nodes:
   - name: cobbler1
-    vbmc: 10.10.10.121
+    vbmc: 192.168.122.121
     vbmc_bridge: br-host
     cpu: 1
     memory: 1024
@@ -52,9 +52,9 @@ cobbler_nodes:
     block_pool: cobbler_pool
     network_device_list:
     - device: eth0
-      ip_address: 10.10.10.130
+      ip_address: 192.168.122.140
       host_net_dev: br-host
-      host_net_mac: 0c:c4:7a:b6:16:f1
+      host_net_mac: 0c:c4:ff:b6:16:f1
     block_device_list:
     - device: sda
       block_size: 10

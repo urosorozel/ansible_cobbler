@@ -21,12 +21,11 @@
 
     - name: Install qemu and libvirt-bin
       apt:
-        name: "{{item}}"
-        update_cache: yes
-      items:
+        name:
         - qemu
-        - libvirt-bin   
+        - libvirt-bin
         - ipmitool
+        update_cache: yes
 
     - name: Add root to group libvirt-qemu for libvirt role to work
       user:
@@ -51,6 +50,7 @@
                      --boot="hd,network,menu=on"
                      --controller="type=scsi"
                      --noautoconsole
+                     --graphics vnc
                      --virt-type="{{ item.virtualization }}"
                      --os-type=linux
         {% for dev in item.block_device_list %}
