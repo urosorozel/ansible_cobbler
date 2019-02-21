@@ -17,4 +17,4 @@ cobbler_ubuntu_profile: "{{ ubuntu_distro_name }}"
 cobler_ubuntu_kickstart: /var/lib/cobbler/kickstarts/ubuntu-server-xenial-unattended-cobbler-rpc.seed
 # Configure tty via serial
 cobbler_tty_enabled: True
-cobbler_tty: ttyS0
+cobbler_tty: ttyS0,115200n8
